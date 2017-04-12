@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Advanced usage &mdash; BlockJuMP.jl 0.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="BlockJuMP.jl 0.0 documentation" href="index.html"/>
+        <link rel="next" title="BlockSolverInterface module (dev)" href="BlockSolverInterface.html"/>
+        <link rel="prev" title="Basic usage" href="quickstart.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> BlockJuMP.jl
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Basic usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#write-the-oracle-solver">Write the oracle solver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attach-the-oracle-solver">Attach the oracle solver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-feature">Advanced feature</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="BlockSolverInterface.html">BlockSolverInterface module (dev)</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">BlockJuMP.jl</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Advanced usage</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/oracle.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="advanced-usage">
+<span id="oracle"></span><h1>Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">No solver over Julia supports this feature yet.</p>
+</div>
+<p>Oracles are customized solvers that can be used to solve efficiently subproblems.
+We introduce them using the example of Generalized Assignment Problem.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Consider a set of machines <code class="docutils literal"><span class="pre">Machines</span> <span class="pre">=</span> <span class="pre">1:M</span></code> and a set of jobs <code class="docutils literal"><span class="pre">Jobs</span> <span class="pre">=</span> <span class="pre">1:J</span></code>.
+A machine <code class="docutils literal"><span class="pre">m</span></code> has a resource capacity <code class="docutils literal"><span class="pre">Capacity[m]</span></code>. When we assign a job
+<code class="docutils literal"><span class="pre">j</span></code> to a machine <code class="docutils literal"><span class="pre">m</span></code>, the job has a cost <code class="docutils literal"><span class="pre">Cost[m,j]</span></code> and consumes
+<code class="docutils literal"><span class="pre">Weight[m,j]</span></code> resources of the machine <code class="docutils literal"><span class="pre">m</span></code>. The goal is to minimize the jobs
+cost sum by assigning each job to a machine while not exceeding the capacity of
+each machine. The model is</p>
+<div class="highlight-julia"><div class="highlight"><pre><span></span><span class="n">gap</span> <span class="o">=</span> <span class="n">BlockModel</span><span class="p">(</span><span class="n">solver</span> <span class="o">=</span> <span class="n">solver</span><span class="p">)</span>
+
+<span class="p">@</span><span class="n">variable</span><span class="p">(</span><span class="n">gap</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">m</span> <span class="k">in</span> <span class="n">Machines</span><span class="p">,</span> <span class="n">j</span> <span class="k">in</span> <span class="n">Jobs</span><span class="p">],</span> <span class="n">Bin</span><span class="p">)</span>
+
+<span class="p">@</span><span class="n">constraint</span><span class="p">(</span><span class="n">gap</span><span class="p">,</span> <span class="n">cov</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="k">in</span> <span class="n">Jobs</span><span class="p">],</span>
+               <span class="n">sum</span><span class="p">{</span> <span class="n">x</span><span class="p">[</span><span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">],</span> <span class="n">m</span> <span class="k">in</span> <span class="n">Machines</span> <span class="p">}</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="p">@</span><span class="n">constraint</span><span class="p">(</span><span class="n">gap</span><span class="p">,</span> <span class="n">knp</span><span class="p">[</span><span class="n">m</span> <span class="k">in</span> <span class="n">Machines</span><span class="p">],</span>
+               <span class="n">sum</span><span class="p">{</span><span class="n">Weight</span><span class="p">[</span><span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">],</span> <span class="n">j</span> <span class="k">in</span> <span class="n">Jobs</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="n">Capacity</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+
+<span class="p">@</span><span class="n">objective</span><span class="p">(</span><span class="n">gap</span><span class="p">,</span> <span class="n">Min</span><span class="p">,</span>
+               <span class="n">sum</span><span class="p">{</span><span class="n">Cost</span><span class="p">[</span><span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">],</span> <span class="n">m</span> <span class="k">in</span> <span class="n">Machines</span><span class="p">,</span> <span class="n">j</span> <span class="k">in</span> <span class="n">Jobs</span><span class="p">})</span>
+
+<span class="k">function</span><span class="nf"> dw_fct</span><span class="p">(</span><span class="n">cstrname</span><span class="p">::</span><span class="n">Symbol</span><span class="p">,</span> <span class="n">cstrid</span><span class="p">::</span><span class="n">Tuple</span><span class="p">)</span> <span class="p">::</span> <span class="n">Tuple</span><span class="p">{</span><span class="n">Symbol</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">}</span>
+  <span class="k">if</span> <span class="n">cstrname</span> <span class="o">==</span> <span class="p">:</span><span class="n">cov</span>            <span class="c"># cov constraints will be assigned in the</span>
+    <span class="k">return</span> <span class="p">(:</span><span class="n">DW_MASTER</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,))</span>    <span class="c"># master that has the index 0</span>
+  <span class="k">else</span>                           <span class="c"># others constraints will be assigned in a</span>
+    <span class="k">return</span> <span class="p">(:</span><span class="n">DW_SP</span><span class="p">,</span> <span class="n">cstrid</span><span class="p">)</span>      <span class="c"># subproblem that has the same index as the constraint</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+<span class="n">add_Dantzig_Wolfe_decomposition</span><span class="p">(</span><span class="n">gap</span><span class="p">,</span> <span class="n">dw_fct</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Generalized Assignment problem can be solved using a Dantzig-Wolfe decomposition.
+Imagine we have a julia function that can solve efficiently the knapsack problem
+and returns the solution and the value of the solution</p>
+<div class="highlight-julia"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">sol</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">solveKnp</span><span class="p">(</span><span class="n">costs</span><span class="p">::</span><span class="n">Vector</span><span class="p">{</span><span class="kt">Float64</span><span class="p">},</span> <span class="n">weights</span><span class="p">::</span><span class="n">Vector</span><span class="p">{</span><span class="n">Integer</span><span class="p">},</span> <span class="n">capacity</span><span class="p">::</span><span class="n">Integer</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="write-the-oracle-solver">
+<h2>Write the oracle solver<a class="headerlink" href="#write-the-oracle-solver" title="Permalink to this headline">¶</a></h2>
+<p>We define an oracle that calls this function and solves each knapsack subproblem.</p>
+<div class="highlight-julia"><div class="highlight"><pre><span></span><span class="k">function</span><span class="nf"> myKnapsackSolver</span><span class="p">(</span><span class="n">od</span><span class="p">::</span><span class="n">OracleSolverData</span><span class="p">)</span>
+  <span class="n">machine</span> <span class="o">=</span> <span class="n">getspid</span><span class="p">(</span><span class="n">od</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c"># get the machine index</span>
+  <span class="n">costs</span> <span class="o">=</span> <span class="p">[</span><span class="n">getcurcost</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">machine</span><span class="p">,</span><span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="k">in</span> <span class="n">Jobs</span><span class="p">]</span> <span class="c"># get the current cost with getcurcost</span>
+  <span class="p">(</span><span class="n">sol_x_m</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">solveKnp</span><span class="p">(</span><span class="n">costs</span><span class="p">,</span> <span class="n">Weight</span><span class="p">[</span><span class="n">m</span><span class="p">,:],</span> <span class="n">Capacity</span><span class="p">[</span><span class="n">m</span><span class="p">])</span> <span class="c"># call the solver</span>
+
+  <span class="c"># Building the oracle solution</span>
+  <span class="k">for</span> <span class="n">j</span> <span class="k">in</span> <span class="n">data</span><span class="o">.</span><span class="n">jobs</span>
+    <span class="c"># add to oracle solution the variables x[machine,j] with the value sol_x_m[j]</span>
+    <span class="n">addtosolution</span><span class="p">(</span><span class="n">od</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">machine</span><span class="p">,</span><span class="n">j</span><span class="p">],</span> <span class="n">sol_x_m</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+  <span class="k">end</span>
+
+  <span class="c"># Set the objective value of the solution</span>
+  <span class="n">setsolutionobjval</span><span class="p">(</span><span class="n">od</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>In this code, we use the four main functions for oracles provided by BlockJuMP.</p>
+<dl class="function">
+<dt>
+<code class="descname">getspid(od::OracleSolverData) :: Tuple</code></dt>
+<dd><p>Returns the subproblem index for which the oracle has been assigned.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="getcurcost">
+<code class="descname">getcurcost</code><span class="sig-paren">(</span><em>x::JuMP.Variable</em><span class="sig-paren">)</span><a class="headerlink" href="#getcurcost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current cost of the varibale <code class="docutils literal"><span class="pre">x</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="addtosolution">
+<code class="descname">addtosolution</code><span class="sig-paren">(</span><em>od::OracleSolverData</em>, <em>x::JuMP.Variable</em>, <em>value::Real</em><span class="sig-paren">)</span><a class="headerlink" href="#addtosolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns the value <code class="docutils literal"><span class="pre">value</span></code> to the variable <code class="docutils literal"><span class="pre">x</span></code> in the solution of the
+oracle solver</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="setsolutionobjval">
+<code class="descname">setsolutionobjval</code><span class="sig-paren">(</span><em>od::OracleSolverData</em>, <em>value::real</em><span class="sig-paren">)</span><a class="headerlink" href="#setsolutionobjval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the objective value of the oracle solver solution.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="attach-the-oracle-solver">
+<h2>Attach the oracle solver<a class="headerlink" href="#attach-the-oracle-solver" title="Permalink to this headline">¶</a></h2>
+<p>Once the oracle solver function defined, we assign it to some subproblems using
+the following function.</p>
+<dl class="function">
+<dt id="addoracletosp!">
+<code class="descname">addoracletosp!</code><span class="sig-paren">(</span><em>m::JuMP.Model</em>, <em>spid::Union{Tuple</em>, <em>Integer}</em>, <em>oraclesolver::Function</em><span class="sig-paren">)</span><a class="headerlink" href="#addoracletosp!" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attaches the <code class="xref jl jl-func docutils literal"><span class="pre">oraclesolver()</span></code> function to the subproblem which has the index <code class="docutils literal"><span class="pre">spid</span></code>.
+The argument <code class="docutils literal"><span class="pre">spid</span></code> must be a <code class="docutils literal"><span class="pre">Tuple</span></code> or an <code class="docutils literal"><span class="pre">Integer</span></code>.</p>
+</dd></dl>
+
+<p>In our example, we do</p>
+<div class="highlight-julia"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">m</span> <span class="k">in</span> <span class="n">data</span><span class="o">.</span><span class="n">machines</span>
+  <span class="n">addoracletosp!</span><span class="p">(</span><span class="n">gap</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">myKnapsackSolver</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="advanced-feature">
+<h2>Advanced feature<a class="headerlink" href="#advanced-feature" title="Permalink to this headline">¶</a></h2>
+<p>For one call, the oracle solver can return several solution by using the
+following function :</p>
+<dl class="function">
+<dt id="attachnewsolution">
+<code class="descname">attachnewsolution</code><span class="sig-paren">(</span><em>od::OracleSolverData</em><span class="sig-paren">)</span><a class="headerlink" href="#attachnewsolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>It ends the current solution and create a new solution in the oracle solver
+solution. Note that the previous solutions cannot be modified anymore.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="BlockSolverInterface.html" class="btn btn-neutral float-right" title="BlockSolverInterface module (dev)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="quickstart.html" class="btn btn-neutral" title="Basic usage" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, REALOPT.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
