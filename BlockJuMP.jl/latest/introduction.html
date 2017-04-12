@@ -31,7 +31,7 @@
 
   
     <link rel="top" title="BlockJuMP.jl 0.0 documentation" href="index.html"/>
-        <link rel="next" title="Quick Start Guide" href="quickstart.html"/>
+        <link rel="next" title="Basic usage" href="basic.html"/>
         <link rel="prev" title="Installation Guide" href="installation.html"/> 
 
   
@@ -88,8 +88,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#dantzig-wolfe-decomposition">Dantzig-Wolfe decomposition</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="oracle.html">Oracle solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basic.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="BlockSolverInterface.html">BlockSolverInterface module (dev)</a></li>
 </ul>
 
@@ -170,7 +170,7 @@ decomposition or Benders decomposition can be applied.</p>
   \text{c}_{3,q}: &amp; \sum_{\alpha=1}^h a_{3,q,\alpha} y_\alpha &amp; + &amp;                                             &amp;   &amp;                                             &amp;   &amp; \sum_{\alpha=1}^k d_{q,\alpha} x_{3,\alpha} &amp; \geq \beta_{3,q} \\
 \end{array}\end{split}\]</div>
 <p>The coefficients matrix has the following block structure :</p>
-<img alt="_images/matrixA_B.png" class="align-center" src="_images/matrixA_B.png" />
+<img alt="_static/matrixA_B.png" class="align-center" src="_static/matrixA_B.png" />
 <p>Hence, we can apply <a class="reference external" href="https://en.wikipedia.org/wiki/Benders_decomposition">Benders decomposition</a> on this problem.</p>
 <p>We partition the variables.
 Variables <span class="math">\(y_\alpha\)</span>, <span class="math">\(\alpha\in \{1 \ldots h\}\)</span> are in the master.
@@ -210,7 +210,7 @@ The user must create a function to describe this decomposition. Such function co
   \text{sc}_{3,q}: &amp;                                         &amp;   &amp;                                                 &amp;   &amp; \sum_{\alpha=1}^k d_{q,i+j+\alpha} x_{i+j+\alpha} &amp; \geq &amp; \beta_{3,q} \\
 \end{array}\end{split}\]</div>
 <p>The coefficients matrix has the following block structure :</p>
-<img alt="_images/matrixA_DW.png" class="align-center" src="_images/matrixA_DW.png" />
+<img alt="_static/matrixA_DW.png" class="align-center" src="_static/matrixA_DW.png" />
 <p>Hence, we can apply <a class="reference external" href="https://en.wikipedia.org/wiki/Dantzig%E2%80%93Wolfe_decomposition">Dantzig-Wolfe decomposition</a> on this problem.</p>
 <p>We partition the constraints.
 Constraints <span class="math">\(\text{mc}_1\)</span> to <span class="math">\(\text{mc}_m\)</span> are in the master.
@@ -239,7 +239,7 @@ to create function to describe this decomposition. Such function could be:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="quickstart.html" class="btn btn-neutral float-right" title="Quick Start Guide" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="basic.html" class="btn btn-neutral float-right" title="Basic usage" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="installation.html" class="btn btn-neutral" title="Installation Guide" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
