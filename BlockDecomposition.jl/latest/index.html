@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>BlockJuMP.jl - JuMP for block structured problems &mdash; BlockJuMP.jl 0.0 documentation</title>
+  <title>BlockDecomposition.jl - JuMP for block structured problems &mdash; BlockDecomposition.jl 0.0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="BlockJuMP.jl 0.0 documentation" href="#"/>
+    <link rel="top" title="BlockDecomposition.jl 0.0 documentation" href="#"/>
         <link rel="next" title="Installation Guide" href="installation.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> BlockJuMP.jl
+            <a href="#" class="icon icon-home"> BlockDecomposition.jl
           
 
           
@@ -99,7 +99,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="#">BlockJuMP.jl</a>
+        <a href="#">BlockDecomposition.jl</a>
       </nav>
 
 
@@ -116,7 +116,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="#">Docs</a> &raquo;</li>
       
-    <li>BlockJuMP.jl - JuMP for block structured problems</li>
+    <li>BlockDecomposition.jl - JuMP for block structured problems</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -130,18 +130,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-BlockJuMP.jl">
-<span id="blockjump-jl-jump-for-block-structured-problems"></span><h1>BlockJuMP.jl - JuMP for block structured problems<a class="headerlink" href="#module-BlockJuMP.jl" title="Permalink to this headline">¶</a></h1>
-<p>BlockJuMP.jl package provides features to take advantage of the shape of
+  <div class="section" id="blockdecomposition-jl-jump-for-block-structured-problems">
+<h1>BlockDecomposition.jl - JuMP for block structured problems<a class="headerlink" href="#blockdecomposition-jl-jump-for-block-structured-problems" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-BlockDecomposition.jl"></span><p>BlockDecomposition.jl package provides features to take advantage of the shape of
 block structured problems.</p>
 <p>The user must be familiar with the syntax of JuMP, which is described in its
 <a class="reference external" href="https://jump.readthedocs.io/en/latest/">documentation</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This package is under development. Although it is a JuMP extension,
+it is not written nor maintained by the primary developers of JuMP.
+Therefore, do not expect high reactiveness on the issues.</p>
+</div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#getting-blockjump-jl">Getting BlockJuMP.jl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#getting-blockdecomposition-jl">Getting BlockDecomposition.jl</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
@@ -163,7 +169,8 @@ block structured problems.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="BlockSolverInterface.html">BlockSolverInterface module (dev)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="BlockSolverInterface.html#instanciation">Instanciation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BlockSolverInterface.html#decomposition-data">Decomposition data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BlockSolverInterface.html#additional-data-to-the-decomposition">Additional data to the decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="BlockSolverInterface.html#additional-data-to-the-model">Additional data to the model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="BlockSolverInterface.html#costs-and-solutions">Costs and solutions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="BlockSolverInterface.html#oracle-solver">Oracle solver</a></li>
@@ -191,7 +198,7 @@ block structured problems.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, REALOPT.
+        &copy; Copyright 2017, ReAlOpt.
 
     </p>
   </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>BlockSolverInterface module (dev) &mdash; BlockJuMP.jl 0.0 documentation</title>
+  <title>BlockSolverInterface module (dev) &mdash; BlockDecomposition.jl 0.0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="BlockJuMP.jl 0.0 documentation" href="index.html"/>
+    <link rel="top" title="BlockDecomposition.jl 0.0 documentation" href="index.html"/>
         <link rel="prev" title="Advanced usage" href="advanced.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> BlockJuMP.jl
+            <a href="index.html" class="icon icon-home"> BlockDecomposition.jl
           
 
           
@@ -86,7 +86,8 @@
 <li class="toctree-l1"><a class="reference internal" href="basic.html">Basic usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced usage</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">BlockSolverInterface module (dev)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#instanciation">Instanciation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#decomposition-data">Decomposition data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-data-to-the-decomposition">Additional data to the decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-data-to-the-model">Additional data to the model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#costs-and-solutions">Costs and solutions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#oracle-solver">Oracle solver</a></li>
@@ -105,7 +106,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">BlockJuMP.jl</a>
+        <a href="index.html">BlockDecomposition.jl</a>
       </nav>
 
 
@@ -138,21 +139,46 @@
             
   <div class="section" id="blocksolverinterface-module-dev">
 <span id="block-solver-interface"></span><h1>BlockSolverInterface module (dev)<a class="headerlink" href="#blocksolverinterface-module-dev" title="Permalink to this headline">¶</a></h1>
-<p>The content of this section is not useful to the user of BlockJuMP.
-It has implementation details about the connection of BlockJuMP with the underlying solver.
-It is aimed mainly at developpers who would like to contribute to BlockJuMP.</p>
-<div class="section" id="instanciation">
-<h2>Instanciation<a class="headerlink" href="#instanciation" title="Permalink to this headline">¶</a></h2>
+<p>The content of this section is not useful to the user of BlockDecomposition.
+It has implementation details about the connection of BlockDecomposition with the underlying solver.
+It is aimed mainly at developpers who would like to contribute to BlockDecomposition.</p>
+<div class="section" id="decomposition-data">
+<h2>Decomposition data<a class="headerlink" href="#decomposition-data" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="set_cstrs_decomposition!">
-<code class="descname">set_cstrs_decomposition!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>data::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_cstrs_decomposition!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> in which subproblems are the constraints.</p>
+<dt id="set_constrs_decomposition!">
+<code class="descname">set_constrs_decomposition!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>data::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_constrs_decomposition!" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> in which subproblems are the constraints.
+Each element of the <code class="docutils literal"><span class="pre">data</span></code> array is a <code class="docutils literal"><span class="pre">Tuple</span></code> containing  <code class="docutils literal"><span class="pre">(constr_name::Symbol,</span> <span class="pre">constr_id::Tuple,</span> <span class="pre">sp_type::Symbol,</span> <span class="pre">sp_id::Tuple)</span></code>.
+<code class="docutils literal"><span class="pre">constr_name</span></code> and <code class="docutils literal"><span class="pre">constr_id</span></code> are the name and the index of the constraint in the JuMP model.
+<code class="docutils literal"><span class="pre">sp_type</span></code> and <code class="docutils literal"><span class="pre">sp_id</span></code> are the type and the index of the subproblem to which the constraint is assigned.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="set_vars_decomposition!">
 <code class="descname">set_vars_decomposition!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>data::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_vars_decomposition!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> in which subproblems are the variables.</p>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> in which subproblems are the variables.
+Each element of the <code class="docutils literal"><span class="pre">data</span></code> array is a <code class="docutils literal"><span class="pre">Tuple</span></code> containing  <code class="docutils literal"><span class="pre">(var_name::Symbol,</span> <span class="pre">var_id::Tuple,</span> <span class="pre">sp_type::Symbol,</span> <span class="pre">sp_id::Tuple)</span></code>.
+<code class="docutils literal"><span class="pre">var_name</span></code> and <code class="docutils literal"><span class="pre">var_id</span></code> are the name and the index of the variable in the JuMP model.
+<code class="docutils literal"><span class="pre">sp_type</span></code> and <code class="docutils literal"><span class="pre">sp_id</span></code> are the type and the index of the subproblem to which the variable is assigned.</p>
+</dd></dl>
+
+<p>BlockDecomposition creates the decomposition list for both constraints and
+variables regardless of the type of decomposition used. Types of subproblem are :</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">:DW_MASTER</span></code> Dantzig-Wolfe master problem</li>
+<li><code class="docutils literal"><span class="pre">:B_MASTER</span></code> Benders master problem</li>
+<li><code class="docutils literal"><span class="pre">:DW_SP</span></code> Dantzig-Wolfe subproblem</li>
+<li><code class="docutils literal"><span class="pre">:B_SP</span></code> Benders subproblem</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="additional-data-to-the-decomposition">
+<h2>Additional data to the decomposition<a class="headerlink" href="#additional-data-to-the-decomposition" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="set_oracles!">
+<code class="descname">set_oracles!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>list::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_oracles!" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the <code class="docutils literal"><span class="pre">list</span></code> with subproblems and oracles functions.</p>
 </dd></dl>
 
 <dl class="function">
@@ -162,30 +188,25 @@ It is aimed mainly at developpers who would like to contribute to BlockJuMP.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="set_oracles!">
-<code class="descname">set_oracles!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>list::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_oracles!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the <code class="docutils literal"><span class="pre">list</span></code> with subproblems and oracles functions.</p>
+<dt id="set_sp_prio!">
+<code class="descname">set_sp_prio!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>priorities::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_sp_prio!" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the list of subproblem priorities.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="set_var_branching_prio!">
+<code class="descname">set_var_branching_prio!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>priorities::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_var_branching_prio!" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the list of variables branching priorities.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="additional-data-to-the-model">
 <h2>Additional data to the model<a class="headerlink" href="#additional-data-to-the-model" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="setobjectivevaluelb!">
-<code class="descname">setobjectivevaluelb!</code><span class="sig-paren">(</span><em>m::AbstractMathProgModel</em>, <em>lb</em><span class="sig-paren">)</span><a class="headerlink" href="#setobjectivevaluelb!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the upper bound of the objective function of the model <code class="docutils literal"><span class="pre">m</span></code> to <code class="docutils literal"><span class="pre">lb</span></code>.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="setobjectivevalueub!">
-<code class="descname">setobjectivevalueub!</code><span class="sig-paren">(</span><em>m::AbstractMathProgModel</em>, <em>ub</em><span class="sig-paren">)</span><a class="headerlink" href="#setobjectivevalueub!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the lower bound of the objective function of the model <code class="docutils literal"><span class="pre">m</span></code> to <code class="docutils literal"><span class="pre">ub</span></code>.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="setobjectivevaluemagnitude!">
-<code class="descname">setobjectivevaluemagnitude!</code><span class="sig-paren">(</span><em>m::AbstractMathProgModel</em>, <em>magnitude</em><span class="sig-paren">)</span><a class="headerlink" href="#setobjectivevaluemagnitude!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the magnitude of the objective function of the model <code class="docutils literal"><span class="pre">m</span></code> to <code class="docutils literal"><span class="pre">magnitude</span></code>.</p>
+<dt id="set_objective_bounds_and_magnitude!">
+<code class="descname">set_objective_bounds_and_magnitude!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>magnitude</em>, <em>lb</em>, <em>ub</em><span class="sig-paren">)</span><a class="headerlink" href="#set_objective_bounds_and_magnitude!" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the magnitude <code class="docutils literal"><span class="pre">magnitude</span></code>, the lower bound <code class="docutils literal"><span class="pre">lb</span></code>
+and the upper bound <code class="docutils literal"><span class="pre">ub</span></code> of the objective function.</p>
 </dd></dl>
 
 </div>
@@ -194,7 +215,7 @@ It is aimed mainly at developpers who would like to contribute to BlockJuMP.</p>
 <dl class="function">
 <dt id="getblocksolution">
 <code class="descname">getblocksolution</code><span class="sig-paren">(</span><em>m::AbstractMathProgModel</em><span class="sig-paren">)</span><a class="headerlink" href="#getblocksolution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the disaggregated solution and store it in <code class="docutils literal"><span class="pre">m.ext[:BlockSolution]</span></code>.</p>
+<dd><p>Get the disaggregated solution and store it in the attribute``ext[:BlockSolution]`` of the JuMP model.</p>
 </dd></dl>
 
 <dl class="function">
@@ -255,7 +276,7 @@ user wants to return several solutions.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, REALOPT.
+        &copy; Copyright 2017, ReAlOpt.
 
     </p>
   </div>
