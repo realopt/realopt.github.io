@@ -177,26 +177,35 @@ variables regardless of the type of decomposition used. Types of subproblem are 
 <h2>Additional data to the decomposition<a class="headerlink" href="#additional-data-to-the-decomposition" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="set_oracles!">
-<code class="descname">set_oracles!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>list::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_oracles!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the <code class="docutils literal"><span class="pre">list</span></code> with subproblems and oracles functions.</p>
+<code class="descname">set_oracles!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>oracles::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_oracles!" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the <code class="docutils literal"><span class="pre">list</span></code> with subproblems and oracles functions.
+Each element of the <code class="docutils literal"><span class="pre">oracles</span></code> array is a <code class="docutils literal"><span class="pre">Tuple</span></code> containing
+<code class="docutils literal"><span class="pre">(sp_id::Tuple,</span> <span class="pre">sp_type::Symbol,</span> <span class="pre">oracle::Function)</span></code> with <code class="docutils literal"><span class="pre">oracle</span></code>, the
+function defined by the user.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="set_sp_mult!">
-<code class="descname">set_sp_mult!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>data::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_sp_mult!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the multiplicity of each subproblem.</p>
+<code class="descname">set_sp_mult!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>multiplicities::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_sp_mult!" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the multiplicity of each subproblem. Each element of
+the <code class="docutils literal"><span class="pre">multiplicities</span></code> array is a <code class="docutils literal"><span class="pre">Tuple</span></code> containing <code class="docutils literal"><span class="pre">(sp_id::Tuple,</span> <span class="pre">sp_type::Symbol,</span> <span class="pre">mult_lb,</span> <span class="pre">mult_ub)</span></code>
+with <code class="docutils literal"><span class="pre">mult_lb</span></code> the lower bound of the multiplicity and <code class="docutils literal"><span class="pre">mult_ub</span></code> the upper
+bound of the multiplicity.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="set_sp_prio!">
 <code class="descname">set_sp_prio!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>priorities::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_sp_prio!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the list of subproblem priorities.</p>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the list of subproblem priorities. Each element of
+the <code class="docutils literal"><span class="pre">data</span></code> array is a <code class="docutils literal"><span class="pre">Tuple</span></code> containing <code class="docutils literal"><span class="pre">(sp_id::Tuple,</span> <span class="pre">sp_type::Symbol,</span> <span class="pre">sp_prio)</span></code>.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="set_var_branching_prio!">
 <code class="descname">set_var_branching_prio!</code><span class="sig-paren">(</span><em>s::AbstractMathProgSolver</em>, <em>priorities::Array</em><span class="sig-paren">)</span><a class="headerlink" href="#set_var_branching_prio!" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the list of variables branching priorities.</p>
+<dd><p>Send to the solver <code class="docutils literal"><span class="pre">s</span></code> the list of variables branching priorities.
+The number stored at the row <code class="docutils literal"><span class="pre">i</span></code> is the branching priority of the variable
+stored at the column <code class="docutils literal"><span class="pre">i</span></code> in the JuMP model.</p>
 </dd></dl>
 
 </div>
