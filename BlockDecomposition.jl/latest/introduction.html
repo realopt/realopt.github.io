@@ -1,304 +1,41 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Introduction &mdash; BlockDecomposition.jl 0.0 documentation</title>
-  
-
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-    <link rel="top" title="BlockDecomposition.jl 0.0 documentation" href="index.html"/>
-        <link rel="next" title="Basic usage" href="basic.html"/>
-        <link rel="prev" title="Installation Guide" href="installation.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
-</head>
-
-<body class="wy-body-for-nav" role="document">
-
-  <div class="wy-grid-for-nav">
-
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
-            <a href="index.html" class="icon icon-home"> BlockDecomposition.jl
-          
-
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                0.0
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-                <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#benders-decomposition">Benders decomposition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dantzig-wolfe-decomposition">Dantzig-Wolfe decomposition</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="basic.html">Basic usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="BlockSolverInterface.html">BlockSolverInterface module (dev)</a></li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">BlockDecomposition.jl</a>
-      </nav>
-
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          
-
- 
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Introduction</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="_sources/introduction.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
-  <div class="section" id="introduction">
-<span id="id1"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>BlockDecomposition.jl is a package providing features to take advantage of the shape
-of block structured problem; in other words, problems on which Dantzig-Wolfe
-decomposition or Benders decomposition can be applied.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<dl class="docutils">
-<dt>This package provides:</dt>
-<dd><ol class="first last arabic simple">
-<li>a JuMP modeling layer for describing Benders decomposition</li>
-<li>a JuMP modeling layer for describing Dantzig-Wolfe decomposition</li>
-<li>an interface to write customized oracles for (Benders/Dantzig-Wolfe) subproblems</li>
-</ol>
-</dd>
-</dl>
-<p class="last">Only the first feature is supported by a solver for now (CPLEX 12.7)</p>
-</div>
-<div class="section" id="benders-decomposition">
-<h2>Benders decomposition<a class="headerlink" href="#benders-decomposition" title="Permalink to this headline">¶</a></h2>
-<p>Consider the following problem</p>
-<div class="math">
-\[\begin{split}\begin{array}{c c c c c c c c}
-  \text{min}       &amp; \sum_{\alpha=1}^h f'_\alpha y_\alpha      &amp; + &amp; \sum_{\alpha=1}^i f_{1,\alpha} x_{1,\alpha} &amp; + &amp; \sum_{\alpha=1}^j f_{2,\alpha} x_{2,\alpha} &amp; + &amp; \sum_{\alpha=1}^k f_{3,\alpha} x_{3,\alpha} &amp;       \\
-  \text{c}_{1,1}  &amp; \sum_{\alpha=1}^h a_{1,1,\alpha} y_\alpha &amp; + &amp; \sum_{\alpha=1}^i b_{1,\alpha} x_{1,\alpha} &amp;   &amp;                                             &amp;   &amp;                                             &amp; \geq \beta_{1,1} \\
-  \vdots           &amp;                                           &amp;   &amp; \vdots                                      &amp;   &amp;                                             &amp;   &amp;                                             &amp;       \\
-  \text{c}_{1,n}: &amp; \sum_{\alpha=1}^h a_{1,n,\alpha} y_\alpha &amp; + &amp; \sum_{\alpha=1}^i b_{n,\alpha} x_{1,\alpha} &amp;   &amp;                                             &amp;   &amp;                                             &amp; \geq \beta_{1,n} \\
-  \text{c}_{2,1}: &amp; \sum_{\alpha=1}^h a_{2,1,\alpha} y_\alpha &amp; + &amp;                                             &amp;   &amp; \sum_{\alpha=1}^j c_{1,\alpha} x_{2,\alpha} &amp;   &amp;                                             &amp; \geq \beta_{2,1} \\
-  \vdots           &amp;                                           &amp;   &amp;                                             &amp;   &amp; \vdots                                      &amp;   &amp;                                             &amp;       \\
-  \text{c}_{2,p}: &amp; \sum_{\alpha=1}^h a_{2,p,\alpha} y_\alpha &amp; + &amp;                                             &amp;   &amp; \sum_{\alpha=1}^j c_{p,\alpha} x_{2,\alpha} &amp;   &amp;                                             &amp; \geq \beta_{2,p} \\
-  \text{c}_{3,1}: &amp; \sum_{\alpha=1}^h a_{3,1,\alpha} y_\alpha &amp; + &amp;                                             &amp;   &amp;                                             &amp;   &amp; \sum_{\alpha=1}^k d_{1,\alpha} x_{3,\alpha} &amp; \geq \beta_{3,1} \\
-  \vdots           &amp;                                           &amp;   &amp;                                             &amp;   &amp;                                             &amp;   &amp; \vdots                                      &amp;       \\
-  \text{c}_{3,q}: &amp; \sum_{\alpha=1}^h a_{3,q,\alpha} y_\alpha &amp; + &amp;                                             &amp;   &amp;                                             &amp;   &amp; \sum_{\alpha=1}^k d_{q,\alpha} x_{3,\alpha} &amp; \geq \beta_{3,q} \\
-\end{array}\end{split}\]</div>
-<p>The coefficients matrix has the following block structure :</p>
-<img alt="_static/matrixA_B.png" class="align-center" src="_static/matrixA_B.png" />
-<p>Hence, we can apply <a class="reference external" href="https://en.wikipedia.org/wiki/Benders_decomposition">Benders decomposition</a> on this problem.</p>
-<p>We partition the variables.
-Variables <span class="math">\(y_\alpha\)</span>, <span class="math">\(\alpha\in \{1 \ldots h\}\)</span> are in the master.
-Variables <span class="math">\(x_{1,\alpha}\)</span>, <span class="math">\(\alpha \in \{1 \ldots i\}\)</span> are in the first subproblem.
-Variables <span class="math">\(x_{2,\alpha}\)</span>, <span class="math">\(\alpha \in \{1 \ldots j\}\)</span> are in the second subproblem.
-Variables <span class="math">\(x_{3,\alpha}\)</span>, <span class="math">\(\alpha \in \{1 \ldots k\}\)</span> are in the third subproblem.</p>
-<p>Assume that <code class="docutils literal"><span class="pre">m</span></code> is the compact formulation written with <a class="reference external" href="https://github.com/JuliaOpt/JuMP.jl">JuMP</a>.
-The user must create a function to describe this decomposition. Such function could be:</p>
-<div class="highlight-julia"><div class="highlight"><pre><span></span><span class="k">function</span><span class="nf"> b_decomp</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">var_id</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">var_name</span> <span class="o">==</span> <span class="p">:</span><span class="n">y</span>
-    <span class="k">return</span> <span class="p">(:</span><span class="n">B_MASTER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-  <span class="k">else</span>
-    <span class="k">return</span> <span class="p">(:</span><span class="n">B_SP</span><span class="p">,</span> <span class="n">var_id</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-<span class="n">add_Benders_decomposition</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">b_decomp</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="dantzig-wolfe-decomposition">
-<h2>Dantzig-Wolfe decomposition<a class="headerlink" href="#dantzig-wolfe-decomposition" title="Permalink to this headline">¶</a></h2>
-<p>Consider the following problem :</p>
-<div class="math">
-\[\begin{split}\begin{array}{c c c c c c c}
-  \text{minimize}  &amp; \sum_{\alpha=1}^i f_\alpha x_\alpha     &amp; + &amp; \sum_{\alpha=1}^j f_{i+\alpha} x_{i+\alpha}     &amp; + &amp; \sum_{\alpha=1}^k f_{i+j+\alpha} x_{i+j+\alpha}   &amp;      &amp;             \\
-  \text{mc}_{1}:   &amp; \sum_{\alpha=1}^i a_{1,\alpha} x_\alpha &amp; + &amp; \sum_{\alpha=1}^j a^{1}_{i+\alpha} x_{i+\alpha} &amp; + &amp; \sum_{\alpha=1}^k a_{1,i+j+\alpha} x_{i+j+\alpha} &amp; \geq &amp; \beta_{0,1} \\
-  \vdots           &amp; \vdots                                  &amp;   &amp; \vdots                                          &amp;   &amp; \vdots                                            &amp;      &amp;             \\
-  \text{mc}_{m}:   &amp; \sum_{\alpha=1}^i a_{m,\alpha} x_\alpha &amp; + &amp; \sum_{\alpha=1}^j a^{m}_{i+\alpha} x_{i+\alpha} &amp; + &amp; \sum_{\alpha=1}^k a_{m,i+j+\alpha} x_{i+j+\alpha} &amp; \geq &amp; \beta_{0,m} \\
-  \text{sc}_{1,1}: &amp; \sum_{\alpha=1}^i b_{1,\alpha} x_\alpha &amp;   &amp;                                                 &amp;   &amp;                                                   &amp; \geq &amp; \beta_{1,1} \\
-  \vdots           &amp; \vdots                                  &amp;   &amp;                                                 &amp;   &amp;                                                   &amp;      &amp;             \\
-  \text{sc}_{1,n}: &amp; \sum_{\alpha=1}^i b_{n,\alpha} x_\alpha &amp;   &amp;                                                 &amp;   &amp;                                                   &amp; \geq &amp; \beta_{1,n} \\
-  \text{sc}_{2,1}: &amp;                                         &amp;   &amp; \sum_{\alpha=1}^j c_{1,i+\alpha} x_{i+\alpha}   &amp;   &amp;                                                   &amp; \geq &amp; \beta_{2,1} \\
-  \vdots           &amp;                                         &amp;   &amp; \vdots                                          &amp;   &amp;                                                   &amp;      &amp;             \\
-  \text{sc}_{2,p}: &amp;                                         &amp;   &amp; \sum_{\alpha=1}^j c_{p,i+\alpha} x_{i+\alpha}   &amp;   &amp;                                                   &amp; \geq &amp; \beta_{2,p} \\
-  \text{sc}_{3,1}: &amp;                                         &amp;   &amp;                                                 &amp;   &amp; \sum_{\alpha=1}^k d_{1,i+j+\alpha} x_{i+j+\alpha} &amp; \geq &amp; \beta_{3,1} \\
-  \vdots           &amp;                                         &amp;   &amp;                                                 &amp;   &amp; \vdots                                            &amp;      &amp;             \\
-  \text{sc}_{3,q}: &amp;                                         &amp;   &amp;                                                 &amp;   &amp; \sum_{\alpha=1}^k d_{q,i+j+\alpha} x_{i+j+\alpha} &amp; \geq &amp; \beta_{3,q} \\
-\end{array}\end{split}\]</div>
-<p>The coefficients matrix has the following block structure :</p>
-<img alt="_static/matrixA_DW.png" class="align-center" src="_static/matrixA_DW.png" />
-<p>Hence, we can apply <a class="reference external" href="https://en.wikipedia.org/wiki/Dantzig%E2%80%93Wolfe_decomposition">Dantzig-Wolfe decomposition</a> on this problem.</p>
-<p>We partition the constraints.
-Constraints <span class="math">\(\text{mc}_1\)</span> to <span class="math">\(\text{mc}_m\)</span> are in the master.
-Constraints <span class="math">\(\text{sc}_{1,1}\)</span> to <span class="math">\(\text{sc}_{1,n}\)</span> are in the first subproblem.
-Constraints <span class="math">\(\text{sc}_{2,1}\)</span> to <span class="math">\(\text{sc}_{2,p}\)</span> are in the second subproblem.
-Constraints <span class="math">\(\text{sc}_{3,1}\)</span> to <span class="math">\(\text{sc}_{3,q}\)</span> are in the third subproblem.</p>
-<p>As for Benders decomposition, the user must
-to create function to describe this decomposition. Such function could be:</p>
-<div class="highlight-julia"><div class="highlight"><pre><span></span><span class="k">function</span><span class="nf"> dw_decomp</span><span class="p">(</span><span class="n">constr_name</span><span class="p">,</span> <span class="n">constr_id</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">constr_name</span> <span class="o">==</span> <span class="p">:</span><span class="n">mc</span>
-    <span class="k">return</span> <span class="p">(:</span><span class="n">DW_MASTER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-  <span class="k">else</span>
-    <span class="k">return</span> <span class="p">(:</span><span class="n">DW_SP</span><span class="p">,</span> <span class="n">constr_id</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-<span class="n">add_Dantzig_Wolfe_decomposition</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dw_decomp</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-
-
-           </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="basic.html" class="btn btn-neutral float-right" title="Basic usage" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="installation.html" class="btn btn-neutral" title="Installation Guide" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2017, ReAlOpt.
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
-      });
-  </script>
-   
-
-</body>
-</html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Introduction · BlockDecomposition</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/highlightjs/default.css" rel="stylesheet" type="text/css"/><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>BlockDecomposition</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" action="search.html"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="index.html">Home</a></li><li><a class="toctext" href="installation.html">Installation</a></li><li class="current"><a class="toctext" href="introduction.html">Introduction</a><ul class="internal"><li><a class="toctext" href="#Benders-decomposition-1">Benders decomposition</a></li><li><a class="toctext" href="#Dantzig-Wolfe-decomposition-1">Dantzig-Wolfe decomposition</a></li></ul></li><li><a class="toctext" href="basic.html">Basic</a></li><li><a class="toctext" href="callbacks.html">Callbacks</a></li><li><a class="toctext" href="advanced.html">Advanced</a></li><li><a class="toctext" href="BlockSolverInterface.html">BlockSolverInterface</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href="introduction.html">Introduction</a></li></ul><a class="edit-page" href="https://github.com/realopt/BlockDecomposition.jl/tree/a36adb3de75462f6e550a2e793580b16eefc65d4/docs/src/introduction.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Introduction</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Introduction-1" href="#Introduction-1">Introduction</a></h1><p>BlockDecomposition.jl is a package providing features to take advantage of the shape of block structured problem; in other words, problems on which Dantzig-Wolfe decomposition or Benders decomposition can be applied.</p><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>This package provides:     1. a JuMP modeling layer for describing Benders decomposition     2. a JuMP modeling layer for describing Dantzig-Wolfe decomposition     3. an interface to write customized oracles for (Benders/Dantzig-Wolfe) subproblems</p><p>Only the first feature is supported by a solver for now (CPLEX 12.7)</p></div></div><h2><a class="nav-anchor" id="Benders-decomposition-1" href="#Benders-decomposition-1">Benders decomposition</a></h2><p>Consider the following problem</p><div>\[\begin{array}{c c c c c c c c}
+\text{min}       &amp; \sum_{\alpha=1}^h f&#39;_\alpha y_\alpha      &amp; + &amp; \sum_{\alpha=1}^i f_{1,\alpha} x_{1,\alpha} &amp; + &amp; \sum_{\alpha=1}^j f_{2,\alpha} x_{2,\alpha} &amp; + &amp; \sum_{\alpha=1}^k f_{3,\alpha} x_{3,\alpha} &amp;       \\
+\text{c}_{1,1}  &amp; \sum_{\alpha=1}^h a_{1,1,\alpha} y_\alpha &amp; + &amp; \sum_{\alpha=1}^i b_{1,\alpha} x_{1,\alpha} &amp;   &amp;                                             &amp;   &amp;                                             &amp; \geq \beta_{1,1} \\
+\vdots           &amp;                                           &amp;   &amp; \vdots                                      &amp;   &amp;                                             &amp;   &amp;                                             &amp;       \\
+\text{c}_{1,n}: &amp; \sum_{\alpha=1}^h a_{1,n,\alpha} y_\alpha &amp; + &amp; \sum_{\alpha=1}^i b_{n,\alpha} x_{1,\alpha} &amp;   &amp;                                             &amp;   &amp;                                             &amp; \geq \beta_{1,n} \\
+\text{c}_{2,1}: &amp; \sum_{\alpha=1}^h a_{2,1,\alpha} y_\alpha &amp; + &amp;                                             &amp;   &amp; \sum_{\alpha=1}^j c_{1,\alpha} x_{2,\alpha} &amp;   &amp;                                             &amp; \geq \beta_{2,1} \\
+\vdots           &amp;                                           &amp;   &amp;                                             &amp;   &amp; \vdots                                      &amp;   &amp;                                             &amp;       \\
+\text{c}_{2,p}: &amp; \sum_{\alpha=1}^h a_{2,p,\alpha} y_\alpha &amp; + &amp;                                             &amp;   &amp; \sum_{\alpha=1}^j c_{p,\alpha} x_{2,\alpha} &amp;   &amp;                                             &amp; \geq \beta_{2,p} \\
+\text{c}_{3,1}: &amp; \sum_{\alpha=1}^h a_{3,1,\alpha} y_\alpha &amp; + &amp;                                             &amp;   &amp;                                             &amp;   &amp; \sum_{\alpha=1}^k d_{1,\alpha} x_{3,\alpha} &amp; \geq \beta_{3,1} \\
+\vdots           &amp;                                           &amp;   &amp;                                             &amp;   &amp;                                             &amp;   &amp; \vdots                                      &amp;       \\
+\text{c}_{3,q}: &amp; \sum_{\alpha=1}^h a_{3,q,\alpha} y_\alpha &amp; + &amp;                                             &amp;   &amp;                                             &amp;   &amp; \sum_{\alpha=1}^k d_{q,\alpha} x_{3,\alpha} &amp; \geq \beta_{3,q} \\
+\end{array}\]</div><p>The coefficients matrix has the following block structure :</p><p><img src="static/matrixA_B.png" alt="BendersImg"/></p><p>Hence, we can apply <a href="https://en.wikipedia.org/wiki/Benders_decomposition">Benders decomposition</a> on this problem.</p><p>We partition the variables.</p><ul><li><p>Variables <span>$y_\alpha$</span>, <span>$\alpha\in \{1 \ldots h\}$</span> are in the master.</p></li><li><p>Variables <span>$x_{1,\alpha}$</span>, <span>$\alpha \in \{1 \ldots i\}$</span> are in the first subproblem.</p></li><li><p>Variables <span>$x_{2,\alpha}$</span>, <span>$\alpha \in \{1 \ldots j\}$</span> are in the second subproblem.</p></li><li><p>Variables <span>$x_{3,\alpha}$</span>, <span>$\alpha \in \{1 \ldots k\}$</span> are in the third subproblem.</p></li></ul><p>Assume that <span>$m$</span> is the compact formulation written with <a href="https://github.com/JuliaOpt/JuMP.jl">JuMP</a>.</p><p>The user must create a function to describe this decomposition. Such function could be:</p><pre><code class="language-julia">function b_decomp(var_name, var_id)
+    if var_name == :y
+        return (:B_MASTER, 0)
+    else
+        return (:B_SP, var_id[1])
+    end
+end
+add_Benders_decomposition(m, b_decomp)</code></pre><h2><a class="nav-anchor" id="Dantzig-Wolfe-decomposition-1" href="#Dantzig-Wolfe-decomposition-1">Dantzig-Wolfe decomposition</a></h2><p>Consider the following problem :</p><div>\[\begin{array}{c c c c c c c}
+\text{minimize}  &amp; \sum_{\alpha=1}^i f_\alpha x_\alpha     &amp; + &amp; \sum_{\alpha=1}^j f_{i+\alpha} x_{i+\alpha}     &amp; + &amp; \sum_{\alpha=1}^k f_{i+j+\alpha} x_{i+j+\alpha}   &amp;      &amp;             \\
+\text{mc}_{1}:   &amp; \sum_{\alpha=1}^i a_{1,\alpha} x_\alpha &amp; + &amp; \sum_{\alpha=1}^j a^{1}_{i+\alpha} x_{i+\alpha} &amp; + &amp; \sum_{\alpha=1}^k a_{1,i+j+\alpha} x_{i+j+\alpha} &amp; \geq &amp; \beta_{0,1} \\
+\vdots           &amp; \vdots                                  &amp;   &amp; \vdots                                          &amp;   &amp; \vdots                                            &amp;      &amp;             \\
+\text{mc}_{m}:   &amp; \sum_{\alpha=1}^i a_{m,\alpha} x_\alpha &amp; + &amp; \sum_{\alpha=1}^j a^{m}_{i+\alpha} x_{i+\alpha} &amp; + &amp; \sum_{\alpha=1}^k a_{m,i+j+\alpha} x_{i+j+\alpha} &amp; \geq &amp; \beta_{0,m} \\
+\text{sc}_{1,1}: &amp; \sum_{\alpha=1}^i b_{1,\alpha} x_\alpha &amp;   &amp;                                                 &amp;   &amp;                                                   &amp; \geq &amp; \beta_{1,1} \\
+\vdots           &amp; \vdots                                  &amp;   &amp;                                                 &amp;   &amp;                                                   &amp;      &amp;             \\
+\text{sc}_{1,n}: &amp; \sum_{\alpha=1}^i b_{n,\alpha} x_\alpha &amp;   &amp;                                                 &amp;   &amp;                                                   &amp; \geq &amp; \beta_{1,n} \\
+\text{sc}_{2,1}: &amp;                                         &amp;   &amp; \sum_{\alpha=1}^j c_{1,i+\alpha} x_{i+\alpha}   &amp;   &amp;                                                   &amp; \geq &amp; \beta_{2,1} \\
+\vdots           &amp;                                         &amp;   &amp; \vdots                                          &amp;   &amp;                                                   &amp;      &amp;             \\
+\text{sc}_{2,p}: &amp;                                         &amp;   &amp; \sum_{\alpha=1}^j c_{p,i+\alpha} x_{i+\alpha}   &amp;   &amp;                                                   &amp; \geq &amp; \beta_{2,p} \\
+\text{sc}_{3,1}: &amp;                                         &amp;   &amp;                                                 &amp;   &amp; \sum_{\alpha=1}^k d_{1,i+j+\alpha} x_{i+j+\alpha} &amp; \geq &amp; \beta_{3,1} \\
+\vdots           &amp;                                         &amp;   &amp;                                                 &amp;   &amp; \vdots                                            &amp;      &amp;             \\
+\text{sc}_{3,q}: &amp;                                         &amp;   &amp;                                                 &amp;   &amp; \sum_{\alpha=1}^k d_{q,i+j+\alpha} x_{i+j+\alpha} &amp; \geq &amp; \beta_{3,q} \\
+\end{array}\]</div><p>The coefficients matrix has the following block structure :</p><p><img src="static/matrixA_DW.png" alt="DWImg"/></p><p>Hence, we can apply <a href="https://en.wikipedia.org/wiki/Dantzig%E2%80%93Wolfe_decomposition">Dantzig-Wolfe decomposition</a> on this problem.</p><p>We partition the constraints.</p><ul><li><p>Constraints <span>$\text{mc}_1$</span> to <span>$\text{mc}_m$</span> are in the master.</p></li><li><p>Constraints <span>$\text{sc}_{1,1}$</span> to <span>$\text{sc}_{1,n}$</span> are in the first subproblem.</p></li><li><p>Constraints <span>$\text{sc}_{2,1}$</span> to <span>$\text{sc}_{2,p}$</span> are in the second subproblem.</p></li><li><p>Constraints <span>$\text{sc}_{3,1}$</span> to <span>$\text{sc}_{3,q}$</span> are in the third subproblem.</p></li></ul><p>As for Benders decomposition, the user must to create function to describe this decomposition. Such function could be: ::</p><pre><code class="language-julia">function dw_decomp(constr_name, constr_id)
+    if constr_name == :mc
+        return (:DW_MASTER, 0)
+    else
+        return (:DW_SP, constr_id[1])
+    end
+end
+add_Dantzig_Wolfe_decomposition(m, dw_decomp)</code></pre><footer><hr/><a class="previous" href="installation.html"><span class="direction">Previous</span><span class="title">Installation</span></a><a class="next" href="basic.html"><span class="direction">Next</span><span class="title">Basic</span></a></footer></article></body></html>
